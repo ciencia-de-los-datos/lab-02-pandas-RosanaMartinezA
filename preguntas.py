@@ -13,7 +13,6 @@ tbl0 = pd.read_csv("tbl0.tsv", sep="\t")
 tbl1 = pd.read_csv("tbl1.tsv", sep="\t")
 tbl2 = pd.read_csv("tbl2.tsv", sep="\t")
 
-
 def pregunta_01():
     """
     ¿Cuál es la cantidad de filas en la tabla `tbl0.tsv`?
@@ -22,7 +21,11 @@ def pregunta_01():
     40
 
     """
-    return tbl0.shape[0]
+    # Cantidad de filas en la tabla `tbl0.tsv`
+    resultados_1 = tbl0.shape[0]
+
+    return resultados_1
+
 
 def pregunta_02():
     """
@@ -32,7 +35,11 @@ def pregunta_02():
     4
 
     """
-    return tbl0.shape[1]
+    # Cantidad de columnas en la tabla `tbl0.tsv`
+    resultados_2 = tbl0.shape[1]
+
+    return resultados_2
+
 
 def pregunta_03():
     """
@@ -48,9 +55,16 @@ def pregunta_03():
     Name: _c1, dtype: int64
 
     """
-    df = tbl0
-    df = df.groupby('_c1')['_c1'].count()
-    return df
+    # Cantidad de registros por cada letra de la columna _c1 del archivo `tbl0.tsv`
+    resultados_3 = tbl0['_c1'].value_counts()
+    # Crear un índice con el orden deseado
+    orden_deseado = ['A', 'B', 'C', 'D', 'E']
+    # Reindexar para obtener los resultados en el orden deseado
+    resultados_3 = resultados_3.reindex(orden_deseado)
+    
+    return resultados_3
+
+
 def pregunta_04():
     """
     Calcule el promedio de _c2 por cada letra de la _c1 del archivo `tbl0.tsv`.
@@ -63,7 +77,10 @@ def pregunta_04():
     E    4.785714
     Name: _c2, dtype: float64
     """
-    return tbl0.groupby('_c1')['_c2'].mean()
+    # Promedio de _c2 por cada letra de la _c1 del archivo `tbl0.tsv`
+    resultados_4 = tbl0.groupby('_c1')['_c2'].mean()
+
+    return resultados_4
 
 
 def pregunta_05():
@@ -80,8 +97,10 @@ def pregunta_05():
     E    9
     Name: _c2, dtype: int64
     """
-    return tbl0.groupby('_c1')['_c2'].max()
+    # Valor máximo de _c2 por cada letra en la columna _c1 del archivo `tbl0.tsv`
+    resultados_5 = tbl0.groupby('_c1')['_c2'].max()
 
+    return resultados_5
 
 
 def pregunta_06():
@@ -93,8 +112,11 @@ def pregunta_06():
     ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
     """
-    return sorted(tbl1._c4.str.capitalize().unique())
+    # Valores únicos de la columna _c4 de del archivo `tbl1.csv` en mayúsculas y ordenados alfabéticamente
+    resultados_6 = tbl1['_c4'].str.upper().unique()
+    resultados_6 = sorted(resultados_6)
 
+    return resultados_6
 
 
 def pregunta_07():
@@ -110,8 +132,10 @@ def pregunta_07():
     E    67
     Name: _c2, dtype: int64
     """
-    return tbl0.groupby('_c1')['_c2'].sum()
+    # Suma de la _c2 por cada letra de la _c1 del archivo `tbl0.tsv`
+    resultados_7 = tbl0.groupby('_c1')['_c2'].sum()
 
+    return resultados_7
 
 
 def pregunta_08():
@@ -129,9 +153,14 @@ def pregunta_08():
     39   39   E    5  1998-01-26    44
 
     """
-    tbl0['suma'] = tbl0._c0 + tbl0._c2
+    # Crear una copia del DataFrame para no modificar el original
+    tbl0_copy = tbl0.copy()
+    
+    # Agregar una columna llamada `suma` con la suma de _c0 y _c2 al archivo `tbl0.tsv`
+    tbl0_copy['suma'] = tbl0_copy['_c0'] + tbl0_copy['_c2']
+    resultados_8 = tbl0_copy
 
-    return tbl0
+    return resultados_8
 
 
 def pregunta_09():
@@ -149,10 +178,14 @@ def pregunta_09():
     39   39   E    5  1998-01-26  1998
 
     """
+    # Crear una copia del DataFrame para no modificar el original
+    tbl0_copy = tbl0.copy()
 
-    tbl0['year'] = tbl0['_c3'].str[:4]
+    # Dividir la columna _c3 por "-" y tomar el primer elemento
+    tbl0_copy['year'] = tbl0_copy['_c3'].str.split('-').str[0]
+    resultados_9 = tbl0_copy
 
-    return tbl0
+    return resultados_9
 
 
 def pregunta_10():
@@ -161,17 +194,29 @@ def pregunta_10():
     la columna _c2 para el archivo `tbl0.tsv`.
 
     Rta/
-                                   _c1
-      _c0
+                                   _c2
+      _c1
     0   A              1:1:2:3:6:7:8:9
     1   B                1:3:4:5:6:8:9
     2   C                    0:5:6:7:9
     3   D                  1:2:3:5:5:7
     4   E  1:1:2:3:3:4:5:5:5:6:7:8:8:9
     """
-    df = tbl0.groupby('_c1')['_c2'].apply(lambda x: ':'.join(map(str, sorted(x)))).reset_index()
-    df.set_index('_c1', inplace=True)
-    return df
+    # Crear una copia del DataFrame para no modificar el original
+    tbl0_copy = tbl0.copy()
+
+    # Definir una función personalizada para mantener el orden de _c2
+    def order_and_join(x):
+        ordered_values = sorted(x)
+        return ':'.join(map(str, ordered_values))
+    
+    # Agrupar por el valor de _c1 y aplicar la función personalizada
+    resultados_10 = tbl0_copy.groupby('_c1')['_c2'].apply(order_and_join).reset_index(name='_c2')
+    # Establecer _c1 como índice
+    resultados_10.set_index('_c1', inplace=True)
+
+    return resultados_10
+
 
 def pregunta_11():
     """
@@ -189,11 +234,13 @@ def pregunta_11():
     38   38      d,e
     39   39    a,d,f
     """
-    df = tbl1
-    df = df.sort_values(by='_c4')
-    df = df.groupby('_c0', as_index=False).agg({'_c4': ','.join})
+    # Crear una copia del DataFrame para no modificar el original
+    tbl1_copy = tbl1.copy()
 
-    return df
+    # Agrupar por _c0 y concatenar los valores de _c4 separados por ',' manteniendo el orden original
+    resultados_11 = tbl1_copy.groupby('_c0')['_c4'].apply(lambda x: ','.join(sorted(set(str(x).split(',')) if isinstance(x, str) else x))).reset_index()
+
+    return resultados_11
 
 
 def pregunta_12():
@@ -211,13 +258,18 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    
-    df = tbl2
-    df['_c5b'] = df['_c5b'].astype("string")
-    df['_c5'] = df['_c5a'] + ":" + df['_c5b']
-    df = df.sort_values(by='_c5')
-    df = df.groupby('_c0', as_index=False).agg({'_c5': ','.join})
-    return df
+    # Crear una copia del DataFrame para no modificar el original
+    tbl2_copy = tbl2.copy()
+
+    # Ordenar el DataFrame por la columna _c5a
+    tbl2_copy = tbl2_copy.sort_values(by='_c5a')
+
+    # Unir las columnas _c5a y _c5b con ':' y concatenar los valores separados por ',' manteniendo el orden original
+    resultados_12 = tbl2_copy.groupby('_c0')[['_c5a', '_c5b']].apply(lambda x: ','.join(map(lambda y: ':'.join(map(str, y)), x.values))).reset_index()
+    resultados_12.columns = ['_c0', '_c5']
+
+    return resultados_12
+
 
 def pregunta_13():
     """
@@ -233,7 +285,14 @@ def pregunta_13():
     E    275
     Name: _c5b, dtype: int64
     """
+    # Crear una copia del DataFrame para no modificar el original
+    tbl0_copy = tbl0.copy()
+    # Crear una copia del DataFrame para no modificar el original
+    tbl2_copy = tbl2.copy()
 
-    df = pd.merge(tbl0, tbl2, on = '_c0')
-    df = df.groupby('_c1')['_c5b'].sum()
-    return df
+    # Unir los DataFrames por la columna _c0
+    tbl0_tbl2 = pd.merge(tbl0_copy, tbl2_copy, on='_c0')
+    # Suma de tbl2._c5b por cada valor en tbl0._c1
+    resultados_13 = tbl0_tbl2.groupby('_c1')['_c5b'].sum()
+
+    return resultados_13
